@@ -387,15 +387,24 @@ function msShort(s) {
 function keyShort(s) {
   return (s||'').replace('會員不拿','不拿').replace('寄放櫃台','櫃台').replace('已給會員','已給').replace('未記錄','?')||'—';
 }
+function fmtDate(v) {
+  if (!v) return '';
+  // 若已是 YYYY/MM/DD 格式直接回傳
+  if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(v)) return v;
+  // 處理 Google Sheets 回傳的完整時間戳記
+  const d = new Date(v);
+  if (isNaN(d)) return v;
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+}
 function norm(raw) {
   return {
     _rowIndex: raw._rowIndex,
     id:    raw['會員編號']||'', name:  raw['姓名']||'',
     phone: raw['電話']||'',    plan:  raw['方案']||'',
-    ms:    raw['會籍狀態']||'',ms2:   raw['會籍起']||'',
-    me:    raw['會籍迄']||'',  room:  raw['更衣室']||'',
-    locker:raw['置物櫃號']||'',ls:    raw['置物起']||'',
-    le:    raw['置物迄']||'',  lkst:  raw['置物狀態']||'',
+    ms:    raw['會籍狀態']||'',ms2:   fmtDate(raw['會籍起']),
+    me:    fmtDate(raw['會籍迄']),  room:  raw['更衣室']||'',
+    locker:raw['置物櫃號']||'',ls:    fmtDate(raw['置物起']),
+    le:    fmtDate(raw['置物迄']),  lkst:  raw['置物狀態']||'',
     key:   raw['鑰匙狀態']||'',note:  raw['備註']||'',
   };
 }
